@@ -1,15 +1,6 @@
 
 import os
-your_access_key = input("access key:")
-your_secret_key = input("secret key:")
-us_region = input("region:")
-your_api_key = input("your openai api key:")
-
-os.environ["AWS_ACCESS_KEY_ID"]=your_access_key
-os.environ["AWS_SECRET_ACCESS_KEY"]=your_secret_key
-os.environ["AWS_DEFAULT_REGION"]=us_region
-
-project_data_dir = "scratchpad"
+from config import *
 
 from openai import OpenAI
 
@@ -79,7 +70,7 @@ def run_and_debug_generated_code(task_name):
         check = input("Do you want to run the generated code:")
         if check == 'y':
             code_str =  get_previous_task_result(task_name)
-            output = execute_file_with_error_handling(task_name.replace(' ', '_')+".py")
+            output = execute_file_with_error_handling(project_data_dir+task_name.replace(' ', '_')+".py")
             if output and output.find("Traceback") != -1:
                 print(output)
                 check = input("Do you want LLM to debug and update the code:")
@@ -120,14 +111,15 @@ def run_code_generation_task(task_name, template, query):
     # print("TEMPLATE:", template)
     # print("QUERY:", query)
 
-    check = input(f"Do you want to run task: <<{task_name}>>:")
+    check = input(f"Do you want to generate code for task: <<{task_name}>>:")
     if check == 'y':
         result = user_query_with_prompt(template, query)
         code_str = code_start(result)
         save_current_task_result(task_name, code_str)
         print(result)
 
-    print(f"The Code in {task_name}.py is ready to run")
+    code_path = project_data_dir+task_name.replace(' ', '_')+".py"
+    print(f"The Code in {code_path} is ready to run\n(make sure to set the required env and pip install if needed)")
 
     run_and_debug_generated_code(task_name)
 
@@ -155,21 +147,65 @@ def run_task(task_name, template, query, type):
     elif type == T_CODE:
         run_code_generation_task(task_name, template, query)
 
+
+def run_task_silent(task_name, template, query, type):
+    task_list[task_name] = type
+    print("Run Task: ", task_name)
+    result = user_query_with_prompt(template, query)
+    save_current_task_result(task_name, result)
+    print(result)
+    return result
+
+def evel_llm_answer(context_c, reply_c):
+
+    query = """You are given a #Context#, and a set of #Answers#, please select the best answer
+    within the provided #Context. Please include the selected answer with the reply.
+    
+    Context: {contx}
+    
+    Answers: {ans}"""
+
+    template = """You are a helpful agent."""
+
+    query = query.format(contx=context_c, ans=reply_c)
+
+    reply = run_task_silent("Get user reuqest - HE SU PPDU", template, query, T_TEXT)
+
+
+
+def run_task_with_multi_context(task_name, context_list, template_m, query, t_type=T_TEXT):
+    context_collect = []
+    reply_collect = []
+    i = 1
+    for data in context_list:
+        template = template_m.format(contx=data)
+        reply = run_task_silent(task_name, template, query, t_type)
+        if "I don't know" not in reply.strip():
+            context_collect.append(data)
+            reply_collect.append(f"Answer {str(i)}: "+reply)
+            i += 1
+
+    if len(reply_collect) > 1:
+        context_c = "\n\n".join(context_collect)
+        reply_c = "\n\n".join(reply_collect)
+
+        evel_llm_answer(context_c, reply_c)
+
 def save_current_task_result(task_name, data):
     if task_list[task_name] == T_JSON:
-        return save_current_json_result(task_name.replace(' ', '_')+".json", data)
+        return save_current_json_result(project_data_dir+task_name.replace(' ', '_')+".json", data)
     if task_list[task_name] == T_TEXT:
-        return save_current_text_result(task_name.replace(' ', '_')+".txt", data)
+        return save_current_text_result(project_data_dir+task_name.replace(' ', '_')+".txt", data)
     if task_list[task_name] == T_CODE:
-        return save_current_code_result(task_name.replace(' ', '_')+".py", data)
+        return save_current_code_result(project_data_dir+task_name.replace(' ', '_')+".py", data)
     
 def get_previous_task_result(task_name):
     if task_list[task_name] == T_JSON:
-        return get_previous_json_result(task_name.replace(' ', '_')+".json")
+        return get_previous_json_result(project_data_dir+task_name.replace(' ', '_')+".json")
     if task_list[task_name] == T_TEXT:
-        return get_previous_text_result(task_name.replace(' ', '_')+".txt")
+        return get_previous_text_result(project_data_dir+task_name.replace(' ', '_')+".txt")
     if task_list[task_name] == T_CODE:
-        return get_previous_code_result(task_name.replace(' ', '_')+".py")
+        return get_previous_code_result(project_data_dir+task_name.replace(' ', '_')+".py")
     return None
     
         
