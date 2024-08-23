@@ -1,6 +1,4 @@
 from util import *
-# import boto3
-# from datetime import datetime
 
 ### Step 1 ###
 
@@ -15,7 +13,7 @@ the technolodge and implementation for a cloud platform.
 You will only use the fact you know to create your answer.
 """
 
-run_task("Generate resource category", template, query, T_TEXT)
+# run_task("Generate resource category", template, query, T_TEXT)
 
 ### Step 1_0 ###
 
@@ -35,10 +33,10 @@ System: You are an expert on cloud computing and responsible for researching
 the technolodge and implementation for a cloud platform. 
 You will only use the fact you know to create your answer.
 """
-data = get_previous_task_result("Generate resource category")
-query = query.format(list=data)
+# data = get_previous_task_result("Generate resource category")
+# query = query.format(list=data)
 
-run_task("Generate resource category", template, query, T_TEXT)
+# run_task("Generate resource category", template, query, T_TEXT)
 
 ### Step 2 ###
 
@@ -64,10 +62,10 @@ Answer:
 
 template = """you are a helpful agent."""
 
-data = get_previous_task_result("Generate resource category")
-query = query.format(list=data)
+# data = get_previous_task_result("Generate resource category")
+# query = query.format(list=data)
 
-run_task("Generate overall list", template, query, T_JSON)
+# run_task("Generate overall list", template, query, T_JSON)
 
 
 query = """
@@ -89,10 +87,10 @@ Make sure you follow these rules:
 3. Don't make up things if you don't know. 
 """
 
-data = get_previous_task_result("Generate overall list")
-query = query.format(list=data)
+# data = get_previous_task_result("Generate overall list")
+# query = query.format(list=data)
 
-run_task("Generate overall_visual_code", template, query, T_CODE)
+# run_task("Generate overall_visual_code", template, query, T_CODE)
 
 ### Step 3 ###
 
@@ -116,10 +114,10 @@ Make sure you follow these rules:
 2. Focus only on the feature implementation.
 3. Don't make up things if you don't know. """
 
-data = get_previous_task_result("Generate resource category")
-query = query.format(list=data)
+# data = get_previous_task_result("Generate resource category")
+# query = query.format(list=data)
 
-run_task("Generate scan_resource_code", template, query, T_CODE)
+# run_task("Generate scan_resource_code", template, query, T_CODE)
 
 ### Step 4 ###
 
@@ -142,10 +140,10 @@ Make sure you follow these rules:
 3. Don't make up things if you don't know. 
    """
 
-data = get_previous_json_result("code_str_result.json")
-query = query.format(list=data)
+# data = get_previous_json_result("code_str_result.json")
+# query = query.format(list=data)
 
-run_task("Generate get_resource_detaiil_code", template, query, T_CODE)
+# run_task("Generate get_resource_detaiil_code", template, query, T_CODE)
 
 ### Step 5 ###
 
@@ -180,27 +178,115 @@ Make sure you follow these rules:
 3. Don't make up things if you don't know. 
 """
 
-data = get_previous_json_result("code_str_detail_result.json")
-query = query.format(list=data)
+# data = get_previous_json_result("code_str_detail_result.json")
+# query = query.format(list=data)
 
-run_task("Visualize relationship", template, query, T_JSON)
+# run_task("Visualize relationship", template, query, T_JSON)
 
-json_data = get_previous_task_result("Visualize relationship")
-
-check = input("Do you want to visualize the realtionships:")
-p_node=700
-p_edge=20
-p_font=12
-while check == 'y':
-   print(json_data)
-   draw_graph(json_data["sources"], json_data["relationships"], p_node=int(p_node), p_edge=int(p_edge), p_font=int(p_font))
-   check = input(f"The current node,edge,font is {p_node},{p_edge},{p_font}. Do you want to adjust with new number:")
-   try:
-      p_node, p_edge, p_font = check.split(",")
-      check = 'y'
-   except:
-      check = 'n'
-      pass
+### Step 6 ###
    
+query = """Your task is to generate python code to convert a json data structure.
+The code's input is a dictionary of key:value pairs with the value as a list of dictionaries.
+The code's output is a dictionary with only the first member kept in the value list.
+
+The input data structure is in the file code_str_detail_result.json
+The output file should be code_str_detail_sample_result.json
+
+Input example:
+
+{
+    "EC2": [
+        {data1: value1,
+        },
+        {data2: value2,
+        }
+    ]
+    "VPC": [
+        {data3: value3,
+        },
+        {data4: value4,
+        }
+    ]
+}
+Output example:
+{
+    "EC2": [
+        {data1: value1,
+        }
+    ]
+    "VPC": [
+        {data3: value3,
+        }
+    ]
+}
 
 
+"""
+
+template = """You are an expert on cloud computing and python coding.
+Make sure you follow these rules:
+1. Ensure all the requirements in the question are met.
+2. Focus only on the feature implementation.
+3. Don't make up things if you don't know."""
+
+run_task("Generate get_resource_sample_code", template, query, T_CODE)
+
+
+query = """Your task is to generate python code to find relationship between the resources of an AWS environment.
+The code should use AWS cloude computing knowledge to discover the relationships 
+from detailed resource data strcutures. The format of the data strcuture is in the following Examples.
+
+**Example**: {example}
+
+
+The code should find the detailed resource data strcuture from file code_str_detail_result.json.
+The code should write the output to file resource_relationships.json.
+
+The output format should be in two lists with one as resource nodes and one as relationship edges. 
+
+This is an example to demonstrate the formate:
+
+    For the relatationships:
+            'A' and 'B' with relationship of 'L1',
+            'B' and 'C' with relationship of 'L2',
+            'C' and 'A' with relationship of 'L3',
+
+    The output should be
+            {{
+            "sources": ["A", "B", "C"],
+            "relationships": [["A", "B", "L1"], ["B", "C", "L2"], ["C", "A", "L3"]]
+            }}
+"""
+
+template = """You are an expert on cloud computing and python coding.
+    Make sure you follow these rules:
+1. Ensure all the requirements in the question are met.
+2. Focus only on the feature implementation.
+3. Don't make up things if you don't know."""
+
+# data = get_previous_json_result("code_str_detail_sample_result.json")
+# query = query.format(example=data)
+# run_task("Generate get relationship code", template, query, T_CODE)
+
+#######
+
+def visualize_result(file_path):
+
+    json_data = get_previous_json_result(file_path)
+
+    check = input("Do you want to visualize the realtionships:")
+    p_node=700
+    p_edge=20
+    p_font=12
+    while check == 'y':
+        print(json_data)
+        draw_graph(json_data["sources"], json_data["relationships"], p_node=int(p_node), p_edge=int(p_edge), p_font=int(p_font))
+        check = input(f"The current node,edge,font is {p_node},{p_edge},{p_font}. Do you want to adjust with new number:")
+        try:
+            p_node, p_edge, p_font = check.split(",")
+            check = 'y'
+        except:
+            check = 'n'
+            pass
+    
+visualize_result("resource_relationships.json")
