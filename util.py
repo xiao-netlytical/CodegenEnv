@@ -156,40 +156,59 @@ def run_task_silent(task_name, template, query, type):
     print(result)
     return result
 
-def evel_llm_answer(context_c, reply_c):
+def evel_llm_answer(context_collect, user_query):
 
-    query = """You are given a #Context#, and a set of #Answers#, please select the best answer
-    within the provided #Context. Please include the selected answer with the reply.
+    query = """You are given a list of <<Context, Answer>> pairs.
+Please rank the answers based on how well they match the given question, 
+considering that the Context is the sole source for the answers.
+If there is a dedicated section to address the Request, the generated answer from the Contex is the best match.
+A better answer should be more specific and technical, strictly based on the facts provided.
+A better answer does not reason, extend, or simplify the topic.
+Rank the answers from best match to least match.
     
-    Context: {contx}
-    
-    Answers: {ans}"""
+    The Question, Context and Answer are given as following:
+
+    Question: {u_query}
+
+    {contx_list}
+    """
+
+    contx_list = """
+
+        <<
+        Context: {contx}
+        Answer: {ans}
+        >>
+
+    """
+
+
+    contx_l = ''
+    for pair in context_collect:
+        contx_l += contx_list.format(contx=pair[0], ans=pair[1])
+
 
     template = """You are a helpful agent."""
 
-    query = query.format(contx=context_c, ans=reply_c)
+    query = query.format(contx_list=contx_l, u_query=user_query)
 
-    reply = run_task_silent("Get user reuqest - HE SU PPDU", template, query, T_TEXT)
+    reply = run_task_silent("Final Answer: ", template, query, T_TEXT)
 
 
 
 def run_task_with_multi_context(task_name, context_list, template_m, query, t_type=T_TEXT):
     context_collect = []
-    reply_collect = []
-    i = 1
-    for data in context_list:
+
+    for i, data in enumerate(context_list):
+        if not data.strip():
+            continue
         template = template_m.format(contx=data)
-        reply = run_task_silent(task_name, template, query, t_type)
+        reply = run_task_silent(task_name+str(i), template, query, t_type)
         if "I don't know" not in reply.strip():
-            context_collect.append(data)
-            reply_collect.append(f"Answer {str(i)}: "+reply)
-            i += 1
+            context_collect.append((data, reply))
 
-    if len(reply_collect) > 1:
-        context_c = "\n\n".join(context_collect)
-        reply_c = "\n\n".join(reply_collect)
-
-        evel_llm_answer(context_c, reply_c)
+    if len(context_collect) > 1:
+        evel_llm_answer(context_collect, query)
 
 def save_current_task_result(task_name, data):
     if task_list[task_name] == T_JSON:
@@ -244,3 +263,22 @@ def draw_graph(sources, relationships, p_node=700, p_edge=20, p_font=12):
     # Display the graph
     plt.title("Relationship Graph")
     plt.show()
+
+def save_documents():
+    import typing as t
+    import jsonlines
+    from langchain.schema import Document
+
+
+    def save_docs_to_jsonl(documents: t.Iterable[Document], file_path: str) -> None:
+        with jsonlines.open(file_path, mode="w") as writer:
+            for doc in documents:
+                writer.write(doc.dict())
+
+
+    def load_docs_from_jsonl(file_path) -> t.Iterable[Document]:
+        documents = []
+        with jsonlines.open(file_path, mode="r") as reader:
+            for doc in reader:
+                documents.append(Document(**doc))
+        return documents
