@@ -55,6 +55,9 @@ def save_current_code_result(file_path, result):
     with open(file_path, "w") as file:
         file.write(result)
 
+def get_task_file_path(task_name):
+    return project_data_dir+task_name.replace(' ', '_')
+
 import subprocess
 def execute_file_with_error_handling(script_path):
     result = subprocess.run(['python3', script_path], capture_output=True, text=True)
@@ -70,7 +73,7 @@ def run_and_debug_generated_code(task_name):
         check = input("Do you want to run the generated code:")
         if check == 'y':
             code_str =  get_previous_task_result(task_name)
-            output = execute_file_with_error_handling(project_data_dir+task_name.replace(' ', '_')+".py")
+            output = execute_file_with_error_handling(get_task_file_path(task_name)+".py")
             if output and output.find("Traceback") != -1:
                 print(output)
                 check = input("Do you want LLM to debug and update the code:")
@@ -109,7 +112,7 @@ def run_text_generation_task(task_name, template, query):
 
 def run_code_generation_task(task_name, template, query):
     # print("TEMPLATE:", template)
-    # print("QUERY:", query)
+    print("QUERY:", query)
 
     check = input(f"Do you want to generate code for task: <<{task_name}>>:")
     if check == 'y':
@@ -118,7 +121,7 @@ def run_code_generation_task(task_name, template, query):
         save_current_task_result(task_name, code_str)
         print(result)
 
-    code_path = project_data_dir+task_name.replace(' ', '_')+".py"
+    code_path = get_task_file_path(task_name)+".py"
     print(f"The Code in {code_path} is ready to run\n(make sure to set the required env and pip install if needed)")
 
     run_and_debug_generated_code(task_name)
@@ -139,6 +142,7 @@ T_TEXT=2
 T_CODE=3
 task_list = {}
 def run_task(task_name, template, query, type):
+    query = populate_task_query(query)
     task_list[task_name] = type
     if type == T_JSON:
         run_json_generation_task(task_name, template, query)
@@ -210,21 +214,22 @@ def run_task_with_multi_context(task_name, context_list, template_m, query, t_ty
     if len(context_collect) > 1:
         evel_llm_answer(context_collect, query)
 
+
 def save_current_task_result(task_name, data):
     if task_list[task_name] == T_JSON:
-        return save_current_json_result(project_data_dir+task_name.replace(' ', '_')+".json", data)
+        return save_current_json_result(get_task_file_path(task_name)+".json", data)
     if task_list[task_name] == T_TEXT:
-        return save_current_text_result(project_data_dir+task_name.replace(' ', '_')+".txt", data)
+        return save_current_text_result(get_task_file_path(task_name)+".txt", data)
     if task_list[task_name] == T_CODE:
-        return save_current_code_result(project_data_dir+task_name.replace(' ', '_')+".py", data)
+        return save_current_code_result(get_task_file_path(task_name)+".py", data)
     
 def get_previous_task_result(task_name):
     if task_list[task_name] == T_JSON:
-        return get_previous_json_result(project_data_dir+task_name.replace(' ', '_')+".json")
+        return get_previous_json_result(get_task_file_path(task_name)+".json")
     if task_list[task_name] == T_TEXT:
-        return get_previous_text_result(project_data_dir+task_name.replace(' ', '_')+".txt")
+        return get_previous_text_result(get_task_file_path(task_name)+".txt")
     if task_list[task_name] == T_CODE:
-        return get_previous_code_result(project_data_dir+task_name.replace(' ', '_')+".py")
+        return get_previous_code_result(get_task_file_path(task_name)+".py")
     return None
     
         
@@ -263,6 +268,102 @@ def draw_graph(sources, relationships, p_node=700, p_edge=20, p_font=12):
     # Display the graph
     plt.title("Relationship Graph")
     plt.show()
+
+
+import re
+
+def find_file_type(file_path):
+    # Construct the full paths for .json and .txt files
+    json_filepath = os.path.join(f"{file_path}.json")
+    txt_filepath = os.path.join(f"{file_path}.txt")
+    
+    # Check if each file exists and return the type
+    if os.path.isfile(json_filepath):
+        return 'T_JSON'
+    elif os.path.isfile(txt_filepath):
+        return 'T_TEXT'
+    else:
+        return None
+
+def running_result_name(task_name, type=''):
+
+    file_path = get_task_file_path(task_name)+"_running_result"
+    if not type:
+        type = find_file_type(file_path)
+
+    if type == 'T_JSON':
+        return file_path+".json"
+    if type == 'T_TEXT':
+        return file_path+".txt"
+    
+    raise TypeError("Missing file: "+file_path)
+
+
+def running_result(task_name):
+    file_path = get_task_file_path(task_name)+"_running_result"
+
+    type = find_file_type(file_path)
+    
+    if type == 'T_JSON':
+        return get_previous_json_result(file_path+".json")
+    if type == 'T_TEXT':
+        return get_previous_text_result(file_path+".txt")
+    
+    raise TypeError("Missing file: "+file_path)
+
+def task_result(task_name):
+    file_path = get_task_file_path(task_name)
+
+    type = find_file_type(file_path)
+    
+    if type == 'T_JSON':
+        return get_previous_json_result(file_path+".json")
+    if type == 'T_TEXT':
+        return get_previous_text_result(file_path+".txt")
+    
+    raise TypeError("Missing file: "+file_path)
+
+def task_result_name(task_name):
+
+    file_path = get_task_file_path(task_name)
+
+    type = find_file_type(file_path)
+
+    if type == 'T_JSON':
+        return file_path+".json"
+    if type == 'T_TEXT':
+        return file_path+".txt"
+    
+    raise TypeError("Missing file: "+file_path)
+    
+def populate_task_query(original_string):
+    allowed_functions = {
+        "task_result": task_result,
+        "running_result": running_result,
+        "running_result_name": running_result_name
+
+    }
+
+    pattern = r"<<(task_result|running_result|running_result_name)\((.*?)\)>>"
+    matches = re.findall(pattern, original_string)
+
+    final_string = original_string
+    for func_name, args in matches:
+        if func_name in allowed_functions:
+            a_list = args.split(',')
+
+            if len(a_list) == 1:
+                result = allowed_functions[func_name](args.strip('"'))
+            elif len(a_list) == 2:
+                result = allowed_functions[func_name](a_list[0].strip().strip('"'), a_list[1].strip())
+            else:
+                raise TypeError("Not handled result file format")
+
+            final_string = final_string.replace(f"""<<{func_name}({args})>>""", str(result))
+
+    return(final_string)
+
+
 
 def save_documents():
     import typing as t

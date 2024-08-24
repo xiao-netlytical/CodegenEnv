@@ -13,7 +13,7 @@ the technolodge and implementation for a cloud platform.
 You will only use the fact you know to create your answer.
 """
 
-# run_task("Generate resource category", template, query, T_TEXT)
+run_task("Generate resource catalog", template, query, T_TEXT)
 
 ### Step 1_0 ###
 
@@ -23,7 +23,7 @@ and the relationships between the resources. Make sure the list is complete.
 You can use the features supported by Wiz as references.
 Only provide the updated list and the differences if there is.
 
-List of sources and relationship: {list}
+List of sources and relationship: <<task_result("Generate resource catalog")>>
 
 Answer:
 """
@@ -33,10 +33,8 @@ System: You are an expert on cloud computing and responsible for researching
 the technolodge and implementation for a cloud platform. 
 You will only use the fact you know to create your answer.
 """
-# data = get_previous_task_result("Generate resource category")
-# query = query.format(list=data)
 
-# run_task("Generate resource category", template, query, T_TEXT)
+# run_task("Generate resource catalog", template, query, T_TEXT)
 
 ### Step 2 ###
 
@@ -55,17 +53,15 @@ the answer should be:
     "relationships": [["A", "B", "L1"], ["B", "C", "L2"], ["C", "A", "L3"]]
     }}
 
-List of source and relationship: {list}
+List of source and relationship: <<task_result("Generate resource catalog")>>
 Answer:
 
 """
 
 template = """you are a helpful agent."""
 
-# data = get_previous_task_result("Generate resource category")
-# query = query.format(list=data)
 
-# run_task("Generate overall list", template, query, T_JSON)
+# run_task("Generate catalog relationship", template, query, T_JSON)
 
 
 query = """
@@ -74,7 +70,7 @@ from the List of source and relationship.
 You should use python, networkx and matplotlib for your coding. 
 The code should be executable. 
 
-List of source and relationship: {list}
+List of source and relationship: <<task_result("Generate catalog relationship")>>
 Answer:
 """
 
@@ -87,10 +83,7 @@ Make sure you follow these rules:
 3. Don't make up things if you don't know. 
 """
 
-# data = get_previous_task_result("Generate overall list")
-# query = query.format(list=data)
-
-# run_task("Generate overall_visual_code", template, query, T_CODE)
+# run_task("Generate drawing", template, query, T_CODE)
 
 ### Step 3 ###
 
@@ -98,10 +91,10 @@ query = """
 Request: Your task is generating the code to scan and discover all the resources in a given AWS environment. 
 The resource type to scan is listed by the #List of source and relationship#.
 You should use python and SDK for your code. 
-The code should write the result to a file - code_str_result.json. 
+The code should write the result to a file - <<running_result_name("Scan resources", T_JSON)>>. 
 When generating the code, put import line inside the main section. The code should be executable. 
 
-List of source and relationship: {list}
+List of source and relationship: <<task_result("Generate resource catalog")>>
 
 Code:
 
@@ -114,10 +107,7 @@ Make sure you follow these rules:
 2. Focus only on the feature implementation.
 3. Don't make up things if you don't know. """
 
-# data = get_previous_task_result("Generate resource category")
-# query = query.format(list=data)
-
-# run_task("Generate scan_resource_code", template, query, T_CODE)
+run_task("Scan resources", template, query, T_CODE)
 
 ### Step 4 ###
 
@@ -125,10 +115,10 @@ query = """
 Request: Your task is generating the code to get the details for the discovered resources.
 You are given the list of Discovered resources for getting the details.
 You should use python and SDK for your code. The code should be executable. 
-The code should write the result to a file - code_str_detail_result.json. 
+The code should write the result to a file - <<running_result_name("Get resource details", T_JSON)>>. 
 Try to have seperate API for per resource and per relationship.
 
-Discovered resources: {list}
+Discovered resources: <<running_result("Scan resources")>>
 
 Code:"""
 
@@ -140,10 +130,8 @@ Make sure you follow these rules:
 3. Don't make up things if you don't know. 
    """
 
-# data = get_previous_json_result("code_str_result.json")
-# query = query.format(list=data)
 
-# run_task("Generate get_resource_detaiil_code", template, query, T_CODE)
+run_task("Get resource details", template, query, T_CODE)
 
 ### Step 5 ###
 
@@ -165,7 +153,7 @@ Using the following as an example for the output format:
         }}
 
 
-Resource details: {list}
+Resource details: <<running_result("Get resource details")>>
 
 Answer:
 
@@ -178,10 +166,7 @@ Make sure you follow these rules:
 3. Don't make up things if you don't know. 
 """
 
-# data = get_previous_json_result("code_str_detail_result.json")
-# query = query.format(list=data)
-
-# run_task("Visualize relationship", template, query, T_JSON)
+# run_task("Get resource relationship", template, query, T_JSON)
 
 ### Step 6 ###
    
@@ -189,8 +174,8 @@ query = """Your task is to generate python code to convert a json data structure
 The code's input is a dictionary of key:value pairs with the value as a list of dictionaries.
 The code's output is a dictionary with only the first member kept in the value list.
 
-The input data structure is in the file code_str_detail_result.json
-The output file should be code_str_detail_sample_result.json
+The input data structure is in the file <<running_result_name("Get resource details", T_JSON)>>
+The output file should be in <<running_result_name("Generate sample data", T_JSON)>>
 
 Input example:
 
@@ -229,18 +214,19 @@ Make sure you follow these rules:
 2. Focus only on the feature implementation.
 3. Don't make up things if you don't know."""
 
-run_task("Generate get_resource_sample_code", template, query, T_CODE)
+run_task("Generate sample data", template, query, T_CODE)
 
 
-query = """Your task is to generate python code to find relationship between the resources of an AWS environment.
-The code should use AWS cloude computing knowledge to discover the relationships 
-from detailed resource data strcutures. The format of the data strcuture is in the following Examples.
+query = """Your task is to generate python code to find relationship between the resources in an AWS environment.
+The code should use the cloud computing knowledge to discover the relationships from **the detailed resource data strcuture**. 
+The code can cross reference the resources by using ties such as names, Ids, cidr blocks or IAM role attachment.
+The format of the data strcuture is in the following Examples.
 
-**Example**: {example}
+**Example**: <<running_result("Generate sample data")>>
 
 
-The code should find the detailed resource data strcuture from file code_str_detail_result.json.
-The code should write the output to file resource_relationships.json.
+The code should find **the detailed resource data strcuture** from the file <<running_result_name("Generate sample data", T_JSON)>>
+The code should write the output to the file <<running_result_name("Generate relationship", T_JSON)>>
 
 The output format should be in two lists with one as resource nodes and one as relationship edges. 
 
@@ -264,16 +250,47 @@ template = """You are an expert on cloud computing and python coding.
 2. Focus only on the feature implementation.
 3. Don't make up things if you don't know."""
 
-# data = get_previous_json_result("code_str_detail_sample_result.json")
-# query = query.format(example=data)
-# run_task("Generate get relationship code", template, query, T_CODE)
 
-#######
+run_task("Generate relationship", template, query, T_CODE)
+visualize_result(running_result("Generate relationship"))
 
-def visualize_result(file_path):
+#####
+query = """Your task is to generate python code to find relationship between the AWS resources 
+and the IAM configurations in an AWS environment.
+The resources are listed in the **Discovered resources**.
+The code should use the cloud computing knowledge and boto3 api to get describe_instances to discover the relationships. 
 
-    json_data = get_previous_json_result(file_path)
 
+Discovered resources: <<running_result("Scan resources")>>
+
+The code should write the output to the file <<running_result_name("Generate IAM relationship", T_JSON)>>
+
+The output format should be in two lists with one as resource nodes and one as relationship edges. 
+
+This is an example to demonstrate the formate:
+
+    For the relatationships:
+            'A' and 'B' with relationship of 'L1',
+            'B' and 'C' with relationship of 'L2',
+            'C' and 'A' with relationship of 'L3',
+
+    The output should be
+            {{
+            "sources": ["A", "B", "C"],
+            "relationships": [["A", "B", "L1"], ["B", "C", "L2"], ["C", "A", "L3"]]
+            }}
+"""
+
+template = """You are an expert on cloud computing and python coding.
+    Make sure you follow these rules:
+1. Ensure all the requirements in the question are met.
+2. Focus only on the feature implementation.
+3. Don't make up things if you don't know."""
+
+
+run_task("Generate IAM relationship", template, query, T_CODE)
+
+def visualize_result(json_data):
     check = input("Do you want to visualize the realtionships:")
     p_node=700
     p_edge=20
@@ -289,4 +306,4 @@ def visualize_result(file_path):
             check = 'n'
             pass
     
-visualize_result("resource_relationships.json")
+visualize_result(running_result("Generate IAM relationship"))
