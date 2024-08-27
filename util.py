@@ -27,7 +27,6 @@ def code_start(s, start_mark="```python", end_mark="```"):
    i2 = s1.find(end_mark)
    s2 = s1[:i2]
 
-   print("Generated Code:", s2)
    return s2
 
 import json
@@ -61,10 +60,7 @@ def get_task_file_path(task_name):
 import subprocess
 def execute_file_with_error_handling(script_path):
     result = subprocess.run(['python3', script_path], capture_output=True, text=True)
-    if result.returncode == 0:
-        print(result.stdout)
-    else:
-        print(result.stderr)
+    if result.returncode != 0:
         return result.stderr
 
 def run_and_debug_generated_code(task_name):
@@ -112,7 +108,7 @@ def run_text_generation_task(task_name, template, query):
 
 def run_code_generation_task(task_name, template, query):
     # print("TEMPLATE:", template)
-    print("QUERY:", query)
+    # print("QUERY:", query)
 
     check = input(f"Do you want to generate code for task: <<{task_name}>>:")
     if check == 'y':
@@ -299,10 +295,11 @@ def running_result_name(task_name, type=''):
     raise TypeError("Missing file: "+file_path)
 
 
-def running_result(task_name):
+def running_result(task_name, type=''):
     file_path = get_task_file_path(task_name)+"_running_result"
 
-    type = find_file_type(file_path)
+    if not type:
+        type = find_file_type(file_path)
     
     if type == 'T_JSON':
         return get_previous_json_result(file_path+".json")
