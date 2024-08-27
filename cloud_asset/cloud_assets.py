@@ -1,3 +1,5 @@
+import sys
+sys.path.append("../")
 from util import *
 
 ### Step 1 ###
@@ -61,7 +63,7 @@ Answer:
 template = """you are a helpful agent."""
 
 
-# run_task("Generate catalog relationship", template, query, T_JSON)
+run_task("Generate catalog relationship", template, query, T_JSON)
 
 
 query = """
@@ -83,7 +85,7 @@ Make sure you follow these rules:
 3. Don't make up things if you don't know. 
 """
 
-# run_task("Generate drawing", template, query, T_CODE)
+run_task("Generate drawing", template, query, T_CODE)
 
 ### Step 3 ###
 
@@ -289,21 +291,4 @@ template = """You are an expert on cloud computing and python coding.
 
 
 run_task("Generate IAM relationship", template, query, T_CODE)
-
-def visualize_result(json_data):
-    check = input("Do you want to visualize the realtionships:")
-    p_node=700
-    p_edge=20
-    p_font=12
-    while check == 'y':
-        print(json_data)
-        draw_graph(json_data["sources"], json_data["relationships"], p_node=int(p_node), p_edge=int(p_edge), p_font=int(p_font))
-        check = input(f"The current node,edge,font is {p_node},{p_edge},{p_font}. Do you want to adjust with new number:")
-        try:
-            p_node, p_edge, p_font = check.split(",")
-            check = 'y'
-        except:
-            check = 'n'
-            pass
-    
 visualize_result(running_result("Generate IAM relationship"))

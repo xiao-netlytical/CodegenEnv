@@ -265,6 +265,21 @@ def draw_graph(sources, relationships, p_node=700, p_edge=20, p_font=12):
     plt.title("Relationship Graph")
     plt.show()
 
+def visualize_result(json_data):
+    check = input("Do you want to visualize the realtionships:")
+    p_node=700
+    p_edge=20
+    p_font=12
+    while check == 'y':
+        print(json_data)
+        draw_graph(json_data["sources"], json_data["relationships"], p_node=int(p_node), p_edge=int(p_edge), p_font=int(p_font))
+        check = input(f"The current node,edge,font is {p_node},{p_edge},{p_font}. Do you want to adjust with new number:")
+        try:
+            p_node, p_edge, p_font = check.split(",")
+            check = 'y'
+        except:
+            check = 'n'
+            pass
 
 import re
 
