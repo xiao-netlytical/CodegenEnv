@@ -23,7 +23,7 @@ template = """
     2. Focus only on the feature implementation.
     3. Don't make up things if you don't know. 
 """
-run_task("Converting xlsx file to csv file", template, query, T_CODE)
+# run_task("Converting xlsx file to csv file", template, query, T_CODE)
 
 ### Task: Generate and run dirty data report ###
 query = """
@@ -56,7 +56,7 @@ Make sure you follow these rules:
 2. Focus only on the feature implementation.
 3. Don't make up things if you don't know. 
 """
-run_task("Generate dirty data report", template, query, T_CODE)
+# run_task("Generate dirty data report", template, query, T_CODE)
 
 ### Task: Find bad cell##
 
@@ -84,14 +84,17 @@ Make sure you follow these rules:
 3. Don't make up things if you don't know. 
 """
 
-run_task("Find problem cells", template, query, T_CODE)
+# run_task("Find problem cells", template, query, T_CODE)
 
 ### Task: Get table headers ###
 query = """
 Request:  Your task is to generate python3 code to get the header names from all the csv files.
-The result should be in the format of file_name followed by a list of column names.
+The result should be in the format of file_name followed by a list of column names in Json format.
 The code will take the csv files from ./data directory and write the result 
-to <<running_result_name("Get table and headers", T_TEXT)>>. The code should be executable by itself.
+to <<running_result_name("Get table and headers", T_JSON)>>. 
+With the generated code, attach a output sample strcuture.
+
+The code should be executable by itself.
 
 Answer:
 """
@@ -105,7 +108,7 @@ Make sure you follow these rules:
 3. Don't make up things if you don't know. 
 """
 
-run_task("Get table and headers", template, query, T_CODE)
+# run_task("Get table and headers", template, query, T_CODE)
 
 
 ### Task: Get all headers ###
@@ -127,13 +130,12 @@ Make sure you follow these rules:
 3. Don't make up things if you don't know. 
 """
 
-run_task("Get all headers", template, query, T_CODE)
+# run_task("Get all headers", template, query, T_CODE)
 
-### Task: Find common column ###
+### Task: Common column grouping ###
 query = """
-Request: You are given a list by #Table headers# as CSV headers.
-You will group the headers to the same group if you think they should represent the same content just 
-because some typo in the name. 
+You are given a list of table headers in #Table headers# for CSV files. 
+Group these headers based on their semantic meaning to represent the same data. 
 
 Table headers: <<running_result("Get all headers")>>
 Answer:
@@ -147,8 +149,57 @@ Make sure you follow these rules:
 3. Don't make up things if you don't know. 
 """
 
-run_task("Find common column", template, query, T_TEXT)
+# run_task("Common column grouping", template, query, T_TEXT)
 
+### Task: Similar column grouping ###
+
+query = """
+You are given a list of table headers in #Table headers# for CSV files. 
+Group these headers based on their meaning to represent the same data.
+
+Table headers: <<running_result("Get all headers")>>
+Answer:
+"""
+
+template = """
+You are an expert on data science and responsible for data analysis.
+Make sure you follow these rules:
+1. Ensure all the requirements in the question are met.
+2. Focus only on the feature implementation.
+3. Don't make up things if you don't know. 
+"""
+
+# run_task("Similar column grouping", template, query, T_TEXT)
+
+### Task: Similar table column grouping ###
+query = """
+Request: Your task is to generate python3 code to associate the header names with the table names.
+Your code will take the following inputs: 
+1. a list header groups: <<task_result("Similar column grouping")>>
+2. a list of table to headers mapping from file  <<running_result_name("Get table and headers")>>.
+   This is an example data structure of the file:
+   {
+    "file1.csv": ["column1", "column2", "column3"],
+    "file2.csv": ["columnA", "columnB", "columnC"],
+    "file3.csv": ["header1", "header2"]
+    }
+
+The code will generate a list of header groups in which the table name is associated with the header name.
+The code should write the result to file - <<running_result_name("Similar table column grouping", T_JSON)>>
+
+
+Answer:
+"""
+
+template = """
+You are an expert on data science and responsible for data analysis.
+Make sure you follow these rules:
+1. Ensure all the requirements in the question are met.
+2. Focus only on the feature implementation.
+3. Don't make up things if you don't know. 
+"""
+
+run_task("Similar table column grouping", template, query, T_CODE)
 
 ### Task: Find loan related dataset ###
 query = """
@@ -167,7 +218,7 @@ Make sure you follow these rules:
 3. Don't make up things if you don't know. 
 """
 
-run_task("Find loan related dataset", template, query, T_TEXT)
+# run_task("Find loan related dataset", template, query, T_TEXT)
 
 ### Task: Find wrong doing dataset ###
 query = """
@@ -186,13 +237,13 @@ Make sure you follow these rules:
 3. Don't make up things if you don't know. 
 """
 
-run_task("Find wrong doing dataset", template, query, T_TEXT)
+# run_task("Find wrong doing dataset", template, query, T_TEXT)
 
 ### Task: Identify redundant column ###
 query = """
 Request: Your task is to generate python3 code to identify the similarity of any two columns within a csv file.
 The code will compare values from every row from the two columns, and give the similarity report in percentage 
-when the similarity is  > 60.
+when the similarity is  > 80.
 The code will take the csv files from ./data directory, walk through all the columns 
 and write the report to file ./data/redundant_columns.txt.  The code should be executable by itself.
 
@@ -207,18 +258,17 @@ Make sure you follow these rules:
 2. Focus only on the feature implementation.
 3. Don't make up things if you don't know. 
 """
-run_task("Identify redundant column in a table", template, query, T_CODE)
+# run_task("Identify redundant column within table", template, query, T_CODE)
 
-### Task: Identify similar column ###
+### Task: Identify column similarity ###
 query = """
-Request: As a data scientist, you need to correlate tables before doing data analysis.
-Your task is to generate python3 code to identify the similarity of two columns from two csv files.
-The two columns should be in the same group listed in the ##Same grouping##. 
-The column should have more than one unique values. The code can use a threshold like 50% to start with.
-The code will take the csv files from ./data directory and write the report to ./data/similar_columns.txt. 
-The code should be executable by itself.
+Request:  Your task is to generate python3 code to identify the similarity of two columns by the rows from the csv files.
+The code should ignore the order of the rows and skip the column which does not have more than one unique value.
+The code should take any two columns from the same group listed in the ##Similarity groupings##. 
+The table names is the csv file names in ./data directory. The code should write the result to ./data/similar_columns.txt, 
+and give the similarity in percentages. The code should be executable by itself.
 
-Same grouping:  <<task_result("Find common column")>>
+Similarity groupings:  <<running_result("Similar table column grouping")>>
 
 Answer:
 """
@@ -232,7 +282,7 @@ Make sure you follow these rules:
 3. Don't make up things if you don't know. 
 """
 
-run_task("Identify similar column", template, query, T_CODE)
+run_task("Identify column similarity", template, query, T_CODE)
 
 
 ###############################
@@ -253,7 +303,7 @@ Make sure you follow these rules:
 3. Don't make up things if you don't know. 
 """
 
-run_task("Design dirty data cleansing", template, query, T_TEXT)
+# run_task("Design dirty data cleansing", template, query, T_TEXT)
 
 ### Step 2 ###
 query = """
@@ -275,4 +325,4 @@ Make sure you follow these rules:
 3. Don't make up things if you don't know. 
 """
 
-run_task("Generate report code", template, query, T_CODE)
+# run_task("Generate report code", template, query, T_CODE)
