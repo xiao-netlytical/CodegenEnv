@@ -266,11 +266,12 @@ query = """
 Request:  Your task is to generate python3 code to identify the similarity of two columns by the rows from the csv files.
 The code should ignore the order of the rows and skip the column which does not have more than one unique value.
 The code should compare any two columns from the same group listed in the file <<running_result_name("Similar table column grouping")>>. 
+Two columns under a group can be in same or different tables. The comparation should include both scenarios.
 The input JSON file will have the following structure as an example:
 
 {
     "Company Information": {
-        "file1.csv": ["公司名称", "公司唯一标识"],
+        "file1.csv": ["公司ID", "公司唯一标识"],
         "file2.csv": ["注册资金"]
     },
     "Legal Information": {
@@ -283,8 +284,8 @@ The input JSON file will have the following structure as an example:
     ...
 }
 
-Where "Company Information" is a group name, "file1.csv" is a table name, and the list is the group members under the group.
-The table names is the csv file names in ./data directory. The code should write the result to ./data/similar_columns.txt when the similarity percentage > 0 
+Where "Company Information" is a group name, "file1.csv" is a table name, and the lists contain the group members.
+The table names is also the csv file names in ./data directory. The code should write the result to ./data/similar_columns.txt when the similarity percentage > 0 
 and also provide the percentages. The code should be executable by itself.
 
 Answer:
@@ -299,16 +300,37 @@ Make sure you follow these rules:
 3. Don't make up things if you don't know. 
 """
 
-# run_task("Identify column similarity", template, query, T_CODE)
+run_task("Identify column similarity", template, query, T_CODE)
 
 
-test_request = """your test setup should have some columns with common cells, 
-the header appeared in the grouping should also be included in the csv file.
+test_request = """In your setup of grouping mapping, the headers associated to the same file
+should be in same csv file. And the columns belonging to same group should share some common values.
+For example for 
+    grouping_data = {
+        "Company Information": {
+            "file1.csv": ["公司ID", "公司唯一标识"],
+            "file2.csv": ["注册资金"]
+        },
+        "Legal Information": {
+            "file1.csv": ["案号", "立案时间"],
+            "file3.csv": ["案件类型"]
+        },
+        "Risk Information": {
+            "file2.csv": ["风险类型"]
+        }
+    }
+
+The file1.csv should have the headers of "公司ID", "公司唯一标识", "案号" and "立案时间".
+The file2.csv should have the headers of "注册资金" and "风险类型".
+For testing purpose, You should set cells in the following pairs of columns to be same: 
+cells of "案号" and "案件类型" should have same values, cells of "公司ID" and "公司唯一标识" should have same values.
 
 The test should cover the cases:
 1. For the headers in the same group and the same file, there should be a similarity result if the percentage > 0.
 2. For the headers in the same group but in different files, there should be a similarity result if the percentage > 0.
-3. For headers in different groups, there should not be any comparation."""
+3. For headers in different groups, there should not be any comparation.
+Verify that you can find "案号" and "案件类型" in the same line and 
+"公司ID" and "公司唯一标识" in the same line."""
 
 test_case_task("Identify column similarity", test_request, query)
 

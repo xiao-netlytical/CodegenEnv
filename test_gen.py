@@ -19,7 +19,13 @@ def test_case_task(test_task, test_request, codegen_query):
     Your code should include the setup and be executable by itself.
     """
 
-    template = """You are a helpful QA agent"""
+    template = """
+        You are a helpful QA agent, 
+        responsible for writing the python code to test required features.
+        Make sure you follow these rules:
+        1. Ensure all the requirements in the question are met.
+        2. Don't make up things if you don't know. 
+        """
 
     code_path = test_task.replace(' ', '_')+".py"
 
