@@ -1,6 +1,7 @@
 import sys
 sys.path.append("../")
 from util import *
+from test_gen import *
 
 ### Task: Converting xlsx file to csv file ###
 query = """ 
@@ -185,8 +186,8 @@ Your code will take the following inputs:
     }
 
 The code will generate a list of header groups in which the table name is associated with the header name.
-The code should write the result to file - <<running_result_name("Similar table column grouping", T_JSON)>>
-
+The code should write the result in json to file - <<running_result_name("Similar table column grouping", T_JSON)>>
+With the generated code, attach a output sample structure.
 
 Answer:
 """
@@ -199,7 +200,7 @@ Make sure you follow these rules:
 3. Don't make up things if you don't know. 
 """
 
-run_task("Similar table column grouping", template, query, T_CODE)
+# run_task("Similar table column grouping", template, query, T_CODE)
 
 ### Task: Find loan related dataset ###
 query = """
@@ -264,11 +265,27 @@ Make sure you follow these rules:
 query = """
 Request:  Your task is to generate python3 code to identify the similarity of two columns by the rows from the csv files.
 The code should ignore the order of the rows and skip the column which does not have more than one unique value.
-The code should take any two columns from the same group listed in the ##Similarity groupings##. 
-The table names is the csv file names in ./data directory. The code should write the result to ./data/similar_columns.txt, 
-and give the similarity in percentages. The code should be executable by itself.
+The code should compare any two columns from the same group listed in the file <<running_result_name("Similar table column grouping")>>. 
+The input JSON file will have the following structure as an example:
 
-Similarity groupings:  <<running_result("Similar table column grouping")>>
+{
+    "Company Information": {
+        "file1.csv": ["公司名称", "公司唯一标识"],
+        "file2.csv": ["注册资金"]
+    },
+    "Legal Information": {
+        "file1.csv": ["案号", "立案时间"],
+        "file3.csv": ["案件类型"]
+    },
+    "Risk Information": {
+        "file2.csv": ["风险类型"]
+    },
+    ...
+}
+
+Where "Company Information" is a group name, "file1.csv" is a table name, and the list is the group members under the group.
+The table names is the csv file names in ./data directory. The code should write the result to ./data/similar_columns.txt when the similarity percentage > 0 
+and also provide the percentages. The code should be executable by itself.
 
 Answer:
 """
@@ -282,8 +299,18 @@ Make sure you follow these rules:
 3. Don't make up things if you don't know. 
 """
 
-run_task("Identify column similarity", template, query, T_CODE)
+# run_task("Identify column similarity", template, query, T_CODE)
 
+
+test_request = """your test setup should have some columns with common cells, 
+the header appeared in the grouping should also be included in the csv file.
+
+The test should cover the cases:
+1. For the headers in the same group and the same file, there should be a similarity result if the percentage > 0.
+2. For the headers in the same group but in different files, there should be a similarity result if the percentage > 0.
+3. For headers in different groups, there should not be any comparation."""
+
+test_case_task("Identify column similarity", test_request, query)
 
 ###############################
 # By listing all the possible cleansing techniques before generating the code, it may generate better coverage.
