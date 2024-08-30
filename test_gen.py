@@ -31,4 +31,4 @@ def test_case_task(test_task, test_request, codegen_query):
 
     query = query.format(code_path=code_path, codegen_query=codegen_query, test_request=test_request)
 
-    run_task(test_task+" test cases", template, query, T_CODE)
+    run_task(test_task+" test cases", template, query, T_TEST)

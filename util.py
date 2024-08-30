@@ -29,6 +29,11 @@ def code_start(s, start_mark="```python", end_mark="```"):
 
    return s2
 
+T_JSON=1
+T_TEXT=2
+T_CODE=3
+T_TEST=4
+
 import json
 def get_previous_json_result(file_path):
     with open(file_path, 'r') as file:
@@ -106,7 +111,7 @@ def run_text_generation_task(task_name, template, query):
         save_current_task_result(task_name, result)
         print(result)
 
-def run_code_generation_task(task_name, template, query):
+def run_code_generation_task(task_name, template, query, type=T_CODE):
     # print("TEMPLATE:", template)
     # print("QUERY:", query)
 
@@ -118,9 +123,15 @@ def run_code_generation_task(task_name, template, query):
         print(result)
 
     code_path = get_task_file_path(task_name)+".py"
-    print(f"The Code in {code_path} is ready to run\n(make sure to set the required env and pip install if needed)")
 
-    run_and_debug_generated_code(task_name)
+    if type==T_CODE:
+        print(f"The Code in {code_path} is ready to run\n(make sure to set the required env and pip install if needed)")
+        run_and_debug_generated_code(task_name)
+    elif type==T_TEST:
+        print(f"\n\n####\nThe Code in {code_path} is ready to run.\
+\nRun it from scratchpad directory. Make sure to have data and scratchpad directory from scratchpad directory.\
+\n(make sure to set the required env and pip install)")
+ 
 
 def run_json_generation_task(task_name, template, query):
     # print("TEMPLATE:", template)
@@ -133,9 +144,6 @@ def run_json_generation_task(task_name, template, query):
         json_data = json.loads(result)
         save_current_task_result(task_name, json_data)
 
-T_JSON=1
-T_TEXT=2
-T_CODE=3
 task_list = {}
 def run_task(task_name, template, query, type):
     query = populate_task_query(query)
@@ -146,6 +154,8 @@ def run_task(task_name, template, query, type):
         run_text_generation_task(task_name, template, query)
     elif type == T_CODE:
         run_code_generation_task(task_name, template, query)
+    elif type == T_TEST:
+        run_code_generation_task(task_name, template, query, T_TEST)
 
 
 def run_task_silent(task_name, template, query, type):
