@@ -271,18 +271,19 @@ The input JSON file will have the following structure as an example:
 
 {
     "Company Information": {
-        "file1.csv": ["公司ID", "公司唯一标识"],
-        "file2.csv": ["注册资金"]
+        "file1.csv": ["Company ID", "Unique Company Identifier"],
+        "file2.csv": ["Registered Capital"]
     },
     "Legal Information": {
-        "file1.csv": ["案号", "立案时间"],
-        "file3.csv": ["案件类型"]
+        "file1.csv": ["Case Number", "Filing Date"],
+        "file3.csv": ["Case Type"]
     },
     "Risk Information": {
-        "file2.csv": ["风险类型"]
+        "file2.csv": ["Risk Type"]
     },
     ...
 }
+
 
 Where "Company Information" is a group name, "file1.csv" is a table name, and the lists contain the group members.
 The table names is also the csv file names in ./data directory. The code should write the result to ./data/similar_columns.txt when the similarity percentage > 0 
@@ -308,29 +309,30 @@ should be in same csv file. And the columns belonging to same group should share
 For example for 
     grouping_data = {
         "Company Information": {
-            "file1.csv": ["公司ID", "公司唯一标识"],
-            "file2.csv": ["注册资金"]
+            "file1.csv": ["Company ID", "Unique Company Identifier"],
+            "file2.csv": ["Registered Capital"]
         },
         "Legal Information": {
-            "file1.csv": ["案号", "立案时间"],
-            "file3.csv": ["案件类型"]
+            "file1.csv": ["Case Number", "Filing Date"],
+            "file3.csv": ["Case Type"]
         },
         "Risk Information": {
-            "file2.csv": ["风险类型"]
+            "file2.csv": ["Risk Type"]
         }
     }
 
-The file1.csv should have the headers of "公司ID", "公司唯一标识", "案号" and "立案时间".
-The file2.csv should have the headers of "注册资金" and "风险类型".
+
+The file1.csv should have the headers of "Company ID", "Unique Company Identifier", "Case Number" and "Filing Date".
+The file2.csv should have the headers of "Registered Capital" and "Risk Type".
 For testing purpose, You should set cells in the following pairs of columns to be same: 
-cells of "案号" and "案件类型" should have same values, cells of "公司ID" and "公司唯一标识" should have same values.
+cells of "Case Number" and "Case Type" should have same values, cells of "Company ID" and "Unique Company Identifier" should have same values.
 
 The test should cover the cases:
 1. For the headers in the same group and the same file, there should be a similarity result if the percentage > 0.
 2. For the headers in the same group but in different files, there should be a similarity result if the percentage > 0.
 3. For headers in different groups, there should not be any comparation.
-Verify that you can find "案号" and "案件类型" in the same line and 
-"公司ID" and "公司唯一标识" in the same line."""
+Verify that you can find "Case Number" and "Case Type" in the same line and 
+"Company ID" and "Unique Company Identifier" in the same line."""
 
 test_case_task("Identify column similarity", test_request, query)
 
