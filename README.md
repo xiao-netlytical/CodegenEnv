@@ -32,4 +32,4 @@ This repository also includes three application projects:
 
 
 
-For inquiries, consulting, or collaboration opportunities, please contact: xiao.netlitical@gmail.com.
+For inquiries, consulting, or collaboration opportunities, please contact: xiao.netlytical@gmail.com.
