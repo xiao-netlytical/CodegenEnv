@@ -384,24 +384,3 @@ def populate_task_query(original_string):
             final_string = final_string.replace(f"""<<{func_name}({args})>>""", str(result))
 
     return(final_string)
-
-
-
-def save_documents():
-    import typing as t
-    import jsonlines
-    from langchain.schema import Document
-
-
-    def save_docs_to_jsonl(documents: t.Iterable[Document], file_path: str) -> None:
-        with jsonlines.open(file_path, mode="w") as writer:
-            for doc in documents:
-                writer.write(doc.dict())
-
-
-    def load_docs_from_jsonl(file_path) -> t.Iterable[Document]:
-        documents = []
-        with jsonlines.open(file_path, mode="r") as reader:
-            for doc in reader:
-                documents.append(Document(**doc))
-        return documents

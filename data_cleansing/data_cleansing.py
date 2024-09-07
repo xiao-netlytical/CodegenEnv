@@ -57,7 +57,7 @@ Make sure you follow these rules:
 2. Focus only on the feature implementation.
 3. Don't make up things if you don't know. 
 """
-# run_task("Generate dirty data report", template, query, T_CODE)
+run_task("Generate dirty data report", template, query, T_CODE)
 
 ### Task: Find bad cell##
 
@@ -85,7 +85,7 @@ Make sure you follow these rules:
 3. Don't make up things if you don't know. 
 """
 
-# run_task("Find problem cells", template, query, T_CODE)
+run_task("Find problem cells", template, query, T_CODE)
 
 ### Task: Get table headers ###
 query = """
@@ -109,7 +109,7 @@ Make sure you follow these rules:
 3. Don't make up things if you don't know. 
 """
 
-# run_task("Get table and headers", template, query, T_CODE)
+run_task("Get table and headers", template, query, T_CODE)
 
 
 ### Task: Get all headers ###
@@ -131,7 +131,7 @@ Make sure you follow these rules:
 3. Don't make up things if you don't know. 
 """
 
-# run_task("Get all headers", template, query, T_CODE)
+run_task("Get all headers", template, query, T_CODE)
 
 ### Task: Common column grouping ###
 query = """
@@ -150,7 +150,7 @@ Make sure you follow these rules:
 3. Don't make up things if you don't know. 
 """
 
-# run_task("Common column grouping", template, query, T_TEXT)
+run_task("Common column grouping", template, query, T_TEXT)
 
 ### Task: Similar column grouping ###
 
@@ -170,7 +170,7 @@ Make sure you follow these rules:
 3. Don't make up things if you don't know. 
 """
 
-# run_task("Similar column grouping", template, query, T_TEXT)
+run_task("Similar column grouping", template, query, T_TEXT)
 
 ### Task: Similar table column grouping ###
 query = """
@@ -200,7 +200,7 @@ Make sure you follow these rules:
 3. Don't make up things if you don't know. 
 """
 
-# run_task("Similar table column grouping", template, query, T_CODE)
+run_task("Similar table column grouping", template, query, T_CODE)
 
 ### Task: Find loan related dataset ###
 query = """
@@ -219,7 +219,7 @@ Make sure you follow these rules:
 3. Don't make up things if you don't know. 
 """
 
-# run_task("Find loan related dataset", template, query, T_TEXT)
+run_task("Find loan related dataset", template, query, T_TEXT)
 
 ### Task: Find wrong doing dataset ###
 query = """
@@ -238,7 +238,7 @@ Make sure you follow these rules:
 3. Don't make up things if you don't know. 
 """
 
-# run_task("Find wrong doing dataset", template, query, T_TEXT)
+run_task("Find wrong doing dataset", template, query, T_TEXT)
 
 ### Task: Identify redundant column ###
 query = """
@@ -259,7 +259,7 @@ Make sure you follow these rules:
 2. Focus only on the feature implementation.
 3. Don't make up things if you don't know. 
 """
-# run_task("Identify redundant column within table", template, query, T_CODE)
+run_task("Identify redundant column within table", template, query, T_CODE)
 
 ### Task: Identify column similarity ###
 query = """

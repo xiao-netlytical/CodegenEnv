@@ -10,6 +10,20 @@ To support this AI-driven approach, we’ve developed a code generation platform
 
 In this repository, we demonstrate how to build a custom code generation environment. We recommend tailoring the environment to your specific needs for software testing and maintenance and selecting appropriate storage solutions to manage intermediate results and interfaces between generated code modules.
 
+This repository also includes three application projects:
+
+1. Multitasking Workflow for Cloud Asset Discovery:  
+
+   In this project, we break down cloud asset and relationship discovery into multi-staged tasks. At each stage, prompts are designed to ensure the generated code builds deeper insights and captures all relevant items and details leading toward the final goal. Through effective prompt engineering, tasks are guided to learn from the outputs of LLM-generated code and integrate them into task interface definitions.
+
+2. Integration of LLM-Performed Tasks with AI-Generated Code for Dataset Cleansing and Preparation:  
+   In this project, we demonstrate an application that integrates tasks completed directly by LLMs and tasks executed using LLM-generated code. Due to the size and security concerns of the dataset, sharing the entire dataset with the LLM is not feasible. To fully leverage cutting-edge generative AI, we prompt the LLM to generate code that extracts key abstractions from the dataset. After prompting the LLM to analyze these extracted key data, we generate additional code to further investigate the dataset based on its analysis.
+   The LLM-generated code is used to convert the dataset into CSV format and extract insights from the CSV files. We also prompt the LLM to classify table headers without exposing the entire dataset, then generate code to analyze the dataset based on this classification.
+
+3. RAG Project with LLM for HW Specification Chatbot: 
+   We showcase using LLM to evaluate RAG contexts based on the LLM responses generated from the provided contexts.
+
+
 Future enhancements:
 
 1. Finalize prompt templates for various types of requests.
@@ -17,19 +31,6 @@ Future enhancements:
 3. Convert LLM-generated code into LLM callback registration prompts.
 4. Package autonomous task code into final software.
 5. Package autonomous unit test code into testing software.
-
-This repository also includes three application projects:
-
-1. Multitasking Workflow for Cloud Asset Discovery:  
-
-   This project demonstrates breaking down asset and relationship discovery into multi-staged tasks. Through effective prompt engineering, tasks can learn the output data structures from LLM-generated code.
-
-2. Integration of LLM-Performed Tasks with AI-Generated Code for Dataset Cleansing and Preparation:  
-   We utilize LLM-generated code to extract insights from CSV files. Additionally, we prompt the LLM to analyze and group table headers without exposing the entire dataset, and then generate code to analyze the dataset based on this grouping.
-
-3. RAG Project with LLM for HW Specification Chatbot: 
-   We showcase using LLM to evaluate RAG contexts based on the LLM responses generated from the provided contexts.
-
 
 
 For inquiries, consulting, or collaboration opportunities, please contact: xiao.netlytical@gmail.com.
