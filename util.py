@@ -83,6 +83,7 @@ def run_and_debug_generated_code(task_name):
                     if check_result:
                         code_str = code_start(check_result)
                         save_current_task_result(task_name, code_str)
+                        print(code_str)
                 check = 'y'
             else:
                 print("The code has run successfully.")
@@ -147,6 +148,7 @@ def run_json_generation_task(task_name, template, query):
 task_list = {}
 def run_task(task_name, template, query, type):
     query = populate_task_query(query)
+    query = populate_task_query_micro(query, task_name)
     task_list[task_name] = type
     if type == T_JSON:
         run_json_generation_task(task_name, template, query)
@@ -345,6 +347,7 @@ def task_result(task_name):
     
     raise TypeError("Missing file: "+file_path)
 
+
 def task_result_name(task_name):
 
     file_path = get_task_file_path(task_name)
@@ -384,3 +387,29 @@ def populate_task_query(original_string):
             final_string = final_string.replace(f"""<<{func_name}({args})>>""", str(result))
 
     return(final_string)
+
+def populate_task_query_micro(original_string, task_name):
+
+    final_string = original_string
+
+    def populate_current_task_file(final_string, task_name):
+        file_path = get_task_file_path(task_name)
+        final_string = final_string.replace("CURRENT_TASK_RESULT_TEXT_FILE", file_path+".txt")
+        final_string = final_string.replace("CURRENT_TASK_RESULT_JSON_FILE", file_path+".json")
+        return final_string
+
+    final_string = populate_current_task_file(final_string, task_name)
+
+    pattern = r"TASK_RESULT\((.*?)\)"
+    matches = re.findall(pattern, final_string)
+
+    for arg in matches:
+        result = task_result(arg.strip('"'))
+
+        final_string = final_string.replace(f"""TASK_RESULT({arg})""", str(result))
+
+    return(final_string)
+
+
+
+  
