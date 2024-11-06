@@ -9,6 +9,34 @@ import time
 
 
 #############################
+def fix_query(user_query):
+    ### Task: fix user query###
+    query = """
+    We have recorded user's query as "{}". The query is related to the data in a set of CSV files.
+    Can you add the puctuation and fixed the query if it is needed?
+    As reference, you are given a set of table headers for CSV files listed in #Table headers#.
+
+    Table headers:   TASK_RESULT("Get all headers")
+    Please reply with only the fixed query, no other information.
+    Answer:
+
+    """
+
+    template = """
+    You are an expert on data science and finance security analysis. 
+    You are responsible for using the data in CSV files to investigate a company or a person financial credit.
+    Make sure you follow these rules:
+    1. Ensure all the requirements in the question are met.
+    2. Focus only on the feature implementation.
+    3. Don't make up things if you don't know. 
+    """
+
+
+    query = query.format(user_query)
+
+    return run_task("fix user query", template, query, T_TEXT)
+
+
 
 def run_query(user_query):
     ### Task: Find user query related data###
@@ -95,6 +123,21 @@ def get_and_run_query():
 
         text = audio_to_text(filename)
         print(text)
-        context_s = run_query(text)
+
+        new_fix = fix_query(text)
+        if new_fix is not None:
+            text = new_fix
+            print("Fixed Query:", text)
+
+        r = input("Generate the response:")
+
+        if r == 'y':
+            context_s = run_query(text)
+        
 
 get_and_run_query()
+
+#"我想了解一下秦皇岛市高深汽车服务有限公司的基本情况？能帮助我查询吗？"
+#"我想了解一下关于广东华阳实业有限公司"
+
+#"我想了解一下关于股东王爷的持股情况姓王的王树叶的叶"

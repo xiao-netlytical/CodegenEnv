@@ -111,6 +111,7 @@ def run_text_generation_task(task_name, template, query):
         result = user_query_with_prompt(template, query)
         save_current_task_result(task_name, result)
         print(result)
+        return result
 
 def run_code_generation_task(task_name, template, query, type=T_CODE):
     # print("TEMPLATE:", template)
@@ -144,6 +145,7 @@ def run_json_generation_task(task_name, template, query):
         result = code_start(result, start_mark="```json")
         json_data = json.loads(result)
         save_current_task_result(task_name, json_data)
+        return result
 
 task_list = {}
 def run_task(task_name, template, query, type):
@@ -151,9 +153,9 @@ def run_task(task_name, template, query, type):
     query = populate_task_query_micro(query, task_name)
     task_list[task_name] = type
     if type == T_JSON:
-        run_json_generation_task(task_name, template, query)
+        return run_json_generation_task(task_name, template, query)
     elif type == T_TEXT:
-        run_text_generation_task(task_name, template, query)
+        return run_text_generation_task(task_name, template, query)
     elif type == T_CODE:
         run_code_generation_task(task_name, template, query)
     elif type == T_TEST:
