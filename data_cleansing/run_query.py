@@ -133,11 +133,13 @@ def get_and_run_query():
 
         if r == 'y':
             context_s = run_query(text)
+        elif r == 'n':
+            continue
+        else:
+            if len(r) > 10:
+                context_s = run_query(r)
+        
+            
         
 
 get_and_run_query()
-
-#"我想了解一下秦皇岛市高深汽车服务有限公司的基本情况？能帮助我查询吗？"
-#"我想了解一下关于广东华阳实业有限公司"
-
-#"我想了解一下关于股东王爷的持股情况姓王的王树叶的叶"
